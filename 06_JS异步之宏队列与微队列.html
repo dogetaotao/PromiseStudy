@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+  /**
+   * 1.JS中用来储存待执行回调函数的队列包含2个不同特定的队列
+   * 2.宏队列：用来保存待执行的宏任务(回调)，比如：定时器回调函数/DOM事件回调/ajax回调
+   * 3.微队列：用来保存待执行的微任务(回调)，比如promise的回调/MutationObserver的回调
+   * 4.JS执行时回区别这2个队列
+   *  1) JS引擎首先必须先执行所有的初始化同步任务代码
+   *  2)每次准备取出第一个宏任务执行前，都要将所有的微任务一个接一个取出来执行
+   */
+
+  setTimeout(() => {
+    console.log(1)
+  }, 0)
+  Promise.resolve().then(() => {
+    console.log(2)
+  })
+  Promise.resolve().then(() => {
+    console.log(3)
+  })
+  console.log(4)
+  //4  2  3  1
+
+
+  setTimeout(() => {
+    console.log(1)
+  }, 0)
+  new Promise((resolve) => {
+    console.log(2)
+    resolve()
+  }).then(() => {
+    console.log(3)
+  }).then(() => {
+    console.log(4)
+  })
+  console.log(5)
+  //2  5  3  4  1
+
+  const first = () => (new Promise((resolve, reject) => {
+    console.log(3)
+    let p = new Promise((resolve, reject) => {
+      console.log(7)
+      setTimeout(() => {
+        console.log(5)
+        resolve(6)
+      }, 0)
+      resolve(1)
+    })
+    resolve(2)
+    p.then((arg) => {
+      console.log(arg)
+    })
+  }))
+
+  first().then((arg) => {
+    console.log(arg)
+  })
+  console.log(4)
+  //3  7  4  1  2  5
+
+
+  setTimeout(() =>{
+    console.log(0)
+  },0)
+  new Promise((resolve, reject) => {
+    console.log(1)
+    resolve()
+  }).then(()=>{
+    console.log(2)
+    new Promise((resolve, reject) => {
+      console.log(3)
+      resolve()
+    }).then(() =>{
+      console.log(4)
+    }).then(() =>{//执行then时便有了结果，cons(6)会先进入队列，cons(5)不会放到队列，因为cons(4)还未执行
+      console.log(5)
+    })
+  }).then(()=>{
+    console.log(6)
+  })
+  
+  new Promise((resolve, reject) =>{
+    console.log(7)
+  } ).then(() =>{
+    console.log(8)
+  })
+
+  //1 7 2 3 8 4 6 5 0
+</script>
+</body>
+</html>

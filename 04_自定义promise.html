@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script src="./MyPromiseUseClass.js"></script>
+
+<script>
+  const p = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      console.log(p)
+      resolve(2)
+    }, 100)
+  })
+
+  p.then(value => {
+      console.log("第一个成功回调", value)
+    },
+    reason => {
+      console.log("第一个失败回调", reason)
+    })
+
+  p.then(value => {
+      console.log("第二个成功回调", value)
+    },
+    reason => {
+      console.log("第二个失败回调", reason)
+    })
+
+  const p2 = MyPromise.resolve()
+  const p3 = MyPromise.resolveDelay(66, 1000)
+  
+  p3.then(
+    value =>{
+      console.log(value)
+    }
+  )
+</script>
+</body>
+</html>
